@@ -2,7 +2,7 @@ from flask import Flask
 from models import db
 from dotenv import load_dotenv
 import os
-import enum
+from sqlalchemy import text
 
 load_dotenv()
 database_url = os.getenv("DATABASE_URL")
@@ -18,6 +18,15 @@ db.init_app(app)
 def home():
     return "INITIAL COMMIT"
 
+@app.route("/testconn")
+def testconn():
+    try:
+        result = db.session.execute(text("SELECT 1"))
+        print("Database connected successfully!")
+        return "Database connected successfully!"
+    except Exception as e:
+        print("Database connection failed:", e)
+        return f"Database connection failed: {e}"
 
 
 if __name__ == "__main__":
