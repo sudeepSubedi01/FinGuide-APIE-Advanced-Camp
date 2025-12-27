@@ -3,6 +3,7 @@ from models import db
 from dotenv import load_dotenv
 import os
 from sqlalchemy import text
+from routes import users_bp
 
 load_dotenv()
 database_url = os.getenv("DATABASE_URL")
@@ -13,6 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
 db.init_app(app)
+app.register_blueprint(users_bp)
 
 @app.route("/")
 def home():
