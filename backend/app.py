@@ -4,14 +4,21 @@ from dotenv import load_dotenv
 import os
 from sqlalchemy import text
 from routes import users_bp, categories_bp, transaction_bp
+from flask_jwt_extended import JWTManager
 
 load_dotenv()
 database_url = os.getenv("DATABASE_URL")
+jwt_secret_key = os.getenv("JWT_SECRET_KEY")
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config["JWT_SECRET_KEY"] = jwt_secret_key
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 3600
+
+jwt = JWTManager(app)
     
 db.init_app(app)
 app.register_blueprint(users_bp, url_prefix='/users')
