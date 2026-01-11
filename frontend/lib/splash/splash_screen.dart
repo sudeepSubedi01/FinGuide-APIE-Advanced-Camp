@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     });
 
     // Delay before moving to Login screen
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -38,7 +38,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF3BC1A8), 
+      // backgroundColor: const Color(0xFF3BC1A8), 
+      backgroundColor: const Color(0xFF008080),
 
       body: Center(
         child: Column(
@@ -53,7 +54,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: Image.asset(
                   'assets/images/splash_image.png',
                   width: 300,
-                  // height: 100,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -70,9 +70,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: const Text(
                   'FinGuide',
                   style: TextStyle(
-                    fontFamily: 'Roboto',
                     fontSize: 35,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
@@ -90,7 +89,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: const Text(
                   'Think Smart, Spend Smart',
                   style: TextStyle(
-                    fontFamily: 'Roboto',
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Colors.white70
