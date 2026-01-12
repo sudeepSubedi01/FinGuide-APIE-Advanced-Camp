@@ -35,11 +35,12 @@ def user_register():
 
     return jsonify({
         'message': 'User registered successfully',
-        "name": name,
-        "email": email,
-        "currency_code": currency_code,
-        "password_hash": password_hash}), 201
-
+        'user': {
+            "name": new_user.name,
+            "email": new_user.email,
+            "currency_code": new_user.currency_code,
+        }
+    }),201
 
 @users_bp.route("/login", methods=["POST"])
 def user_login():
@@ -63,9 +64,10 @@ def user_login():
     return jsonify({
         'message': 'Login successful',
         'access_token': access_token,
-        'user_id': user.user_id,
-        'name': user.name,
-        'email':user.email,
-        'password_hash': user.password_hash,
-        'password': password
+        'user':{
+            'user_id': user.user_id,
+            'name': user.name,
+            'email':user.email,
+            'currency_code':user.currency_code
+        }        
     }), 200
