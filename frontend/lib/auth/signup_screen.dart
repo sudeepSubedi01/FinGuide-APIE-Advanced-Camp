@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:frontend/models/currency.dart';
+import 'package:frontend/services/api_service.dart';
 
 Future<List<Currency>> loadCurrencies() async {
   final jsonString = await rootBundle.loadString("assets/data/currencies.json");
@@ -33,10 +34,18 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  bool loading = false;
+  String error = "";
+
   @override
   Widget build(BuildContext context) {
-    final passwordController = TextEditingController();
-    final _formKey = GlobalKey<FormState>();
+    // final passwordController = TextEditingController();
+    // final _formKey = GlobalKey<FormState>();
     return Scaffold(
       // backgroundColor: const Color(0xFF3BC1A8),
       backgroundColor: const Color(0xFF008080),
@@ -118,6 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         }
                         return null;
                       },
+                      controller: nameController,
                     ),
 
                     const SizedBox(height: 16),
@@ -330,11 +340,43 @@ class _SignupScreenState extends State<SignupScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            print("Proceed to login");
-                          }
-                        },
+                        onPressed: loading
+                            ? null
+                            : () async {
+                                if (!_formKey.currentState!.validate()) return;
+
+                                setState(() {
+                                  loading = true;
+                                  error = "";
+                                });
+
+                                final res = await ApiService.register(
+                                  nameController.text.trim(),
+                                  emailController.text.trim(),
+                                  passwordController.text,
+                                  selectedCurrency!.code,
+                                );
+
+                                setState(() => loading = false);
+
+                                if (res["status"] == 201) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Account created! Please login.",
+                                      ),
+                                    ),
+                                  );
+
+                                  Navigator.pop(context); // back to login
+                                } else {
+                                  setState(() {
+                                    error =
+                                        res["body"]["error"] ??
+                                        "Registration failed";
+                                  });
+                                }
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: const Color(0xFF008080),
