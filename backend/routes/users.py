@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 users_bp = Blueprint("users", __name__)
 
@@ -71,3 +71,21 @@ def user_login():
             'currency_code':user.currency_code
         }        
     }), 200
+
+@users_bp.route("/me", methods=["GET"])
+# @jwt_required
+def user_profle():
+    # user_id = get_jwt_identity()
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({'error':'user_id missing'}),400
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "user not found"}), 404
+    
+    return jsonify({
+        "id": user.user_id,
+        "name": user.name,
+        "email": user.email
+    })
