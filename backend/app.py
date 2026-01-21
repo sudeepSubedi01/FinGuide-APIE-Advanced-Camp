@@ -12,7 +12,8 @@ database_url = os.getenv("DATABASE_URL")
 jwt_secret_key = os.getenv("JWT_SECRET_KEY")
 
 app = Flask(__name__)
-CORS(users_bp)
+# CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
