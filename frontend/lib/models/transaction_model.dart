@@ -2,7 +2,7 @@ class TransactionModel {
   final String categoryName;
   final String description;
   final String transactionType;
-  final String date;
+  final DateTime date;
   final double amount;
 
   TransactionModel({
@@ -22,7 +22,7 @@ class TransactionModel {
           : "Uncategorized",
       description: json['description'] ?? "",
       transactionType: json['transaction_type'] ?? "",
-      date: json['transaction_date'] ?? "",
+      date: DateTime.parse(json['transaction_date']),
       amount: (json['amount'] as num).toDouble(),
     );
   }

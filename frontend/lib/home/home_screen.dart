@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     TransactionListScreen(),
-    CategoryMgmtScreen(),
+    CategoryManagementScreen(),
     AiInsightsScreen(),
     UserProfileScreen(),
   ];

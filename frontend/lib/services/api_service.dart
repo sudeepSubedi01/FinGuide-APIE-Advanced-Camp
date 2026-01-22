@@ -155,9 +155,7 @@ class ApiService {
     return data.map((e) => CategoryStat.fromJson(e)).toList();
   }
 
-  static Future<UserDetails> getCurrentUser({
-    required int userId,
-  }) async {
+  static Future<UserDetails> getCurrentUser({required int userId}) async {
     final uri = Uri.parse(
       "$baseUrl/users/me",
     ).replace(queryParameters: {"user_id": userId.toString()});
@@ -169,5 +167,83 @@ class ApiService {
     }
 
     return UserDetails.fromJson(jsonDecode(res.body));
+  }
+
+  //================Create Transaction===================================================================
+  static Future<void> createTransaction({
+    required int userId,
+    required double amount,
+    int? categoryId,
+    required String transactionType,
+    required DateTime transactionDate,
+    required String description,
+  }) async {
+    final payload = {
+      "user_id": userId,
+      "amount": amount,
+      "transaction_type": transactionType,
+      "transaction_date": transactionDate.toIso8601String().split("T")[0],
+      "description": description,
+      "category_id": categoryId,
+    };
+
+    final res = await http.post(
+      Uri.parse("$baseUrl/transactions"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(payload),
+    );
+
+    if (res.statusCode != 200 && res.statusCode != 201) {
+      throw Exception("Failed to create transaction");
+    }
+  }
+
+  //==============================Get Categories=======================================================
+  static Future<List<Map<String, dynamic>>> getCategories({
+    required int userId,
+  }) async {
+    final uri = Uri.parse(
+      "$baseUrl/categories",
+    ).replace(queryParameters: {"user_id": userId.toString()});
+
+    final res = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        // "Authorization": "Bearer $token"},
+      },
+    );
+
+    if (res.statusCode != 200) {
+      throw Exception("Failed to load categories");
+    }
+
+    final List data = jsonDecode(res.body);
+    return data.cast<Map<String, dynamic>>();
+  }
+
+  //======================================Create Category===============================================
+  static Future<void> createCategory({
+    required int userId,
+    required String name,
+  }) async {
+    final res = await http.post(
+      Uri.parse("$baseUrl/categories"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"user_id": userId, "name": name}),
+    );
+
+    if (res.statusCode != 200 && res.statusCode != 201) {
+      throw Exception("Failed to create category");
+    }
+  }
+
+  //=======================================Delete Category==============================================
+  static Future<void> deleteCategory(int id) async {
+    final res = await http.delete(Uri.parse("$baseUrl/categories/$id"));
+
+    if (res.statusCode != 200) {
+      throw Exception("Failed to delete category");
+    }
   }
 }
