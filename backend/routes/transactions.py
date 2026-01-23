@@ -9,7 +9,6 @@ transaction_bp = Blueprint("transactions", __name__)
 @transaction_bp.route("", methods=['GET'])
 # @jwt_required()
 def list_transactions():
-    print("Transactions api hit")
     user_id = request.args.get('user_id')
     # user_id = get_jwt_identity()
     if not user_id:
@@ -39,9 +38,9 @@ def create_transaction():
 
     user_id = data.get("user_id")
     # user_id = get_jwt_identity()
-    category_id = data.get('category_id')
     amount = data.get('amount')
     transaction_type_enum = TransactionType(data.get('transaction_type'))
+    category_id = data.get("category_id") if data.get("transaction_type") == "expense" else None
     transaction_date = datetime.strptime(data.get('transaction_date'), "%Y-%m-%d").date()
     description = data.get('description')
 
