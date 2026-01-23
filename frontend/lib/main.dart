@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'splash/splash_screen.dart';
+import 'package:frontend/home/home_screen.dart';
+import 'package:frontend/dashboard/dashboard_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'PlusJakartaSans',
       ),
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+      home: const HomeScreen(),
     );
   }
 }

@@ -5,10 +5,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 categories_bp = Blueprint("categories", __name__)
 
 @categories_bp.route("/", methods=['GET'])
-@jwt_required()
+# @jwt_required()
 def get_categories():
-    # user_id = request.args.get('user_id')
-    user_id = get_jwt_identity()
+    user_id = request.args.get('user_id')
+    # user_id = get_jwt_identity()
 
     if not user_id:
         return jsonify({'error':'user_id missing'}),400
@@ -22,11 +22,11 @@ def get_categories():
     return jsonify(result)
 
 @categories_bp.route("/", methods=['POST'])
-@jwt_required()
+# @jwt_required()
 def create_category():
     data = request.get_json()
-    # user_id = data.get('user_id')
-    user_id = get_jwt_identity()
+    user_id = data.get('user_id')
+    # user_id = get_jwt_identity()
     name = data.get('name')
 
     if not name:

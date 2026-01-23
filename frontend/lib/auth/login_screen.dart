@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/home/home_screen.dart';
 import 'signup_screen.dart';
+import '../services/api_service.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
     return Scaffold(
       // backgroundColor: const Color(0xFF3BC1A8),
       backgroundColor: const Color(0xFF008080),
@@ -59,7 +63,7 @@ class LoginScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextField(
+                  TextFormField(
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: "Email",
@@ -79,11 +83,12 @@ class LoginScreen extends StatelessWidget {
                         vertical: 14,
                       ),
                     ),
+                    controller: emailController,
                   ),
 
                   const SizedBox(height: 16),
 
-                  TextField(
+                  TextFormField(
                     obscureText: true,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
@@ -104,6 +109,7 @@ class LoginScreen extends StatelessWidget {
                         vertical: 14,
                       ),
                     ),
+                    controller: passwordController,
                   ),
 
                   const SizedBox(height: 24),
@@ -111,7 +117,25 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final email = emailController.text;
+                        final password = passwordController.text;
+
+                        final success = await ApiService.login(email, password);
+
+                        if (success) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const HomeScreen(),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Invalid login")),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: const Color(0xFF008080),

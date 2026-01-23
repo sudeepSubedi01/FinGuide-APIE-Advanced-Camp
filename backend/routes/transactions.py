@@ -6,10 +6,12 @@ from datetime import datetime
 transaction_bp = Blueprint("transactions", __name__)
 
 @transaction_bp.route("/", methods=['GET'])
-@jwt_required()
+@transaction_bp.route("", methods=['GET'])
+# @jwt_required()
 def list_transactions():
-    # user_id = request.args.get('user_id')
-    user_id = get_jwt_identity()
+    print("Transactions api hit")
+    user_id = request.args.get('user_id')
+    # user_id = get_jwt_identity()
     if not user_id:
         return jsonify({'error':'user_id missing'}),400
     
@@ -30,12 +32,13 @@ def list_transactions():
     return jsonify(result)
 
 @transaction_bp.route("/", methods=['POST'])
-@jwt_required()
+@transaction_bp.route("", methods=['POST'])
+# @jwt_required()
 def create_transaction():
     data = request.get_json()
 
-    # user_id = data.get("user_id")
-    user_id = get_jwt_identity()
+    user_id = data.get("user_id")
+    # user_id = get_jwt_identity()
     category_id = data.get('category_id')
     amount = data.get('amount')
     transaction_type_enum = TransactionType(data.get('transaction_type'))

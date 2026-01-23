@@ -19,7 +19,7 @@ def get_summary():
 
     return jsonify(
         {
-            "total income": total_income,
+            "total_income": total_income,
             "total_expense": total_expense
         }
     )

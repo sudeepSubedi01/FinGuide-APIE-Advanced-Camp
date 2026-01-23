@@ -5,12 +5,15 @@ import os
 from sqlalchemy import text
 from routes import users_bp, categories_bp, transaction_bp, stats_bp
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 load_dotenv()
 database_url = os.getenv("DATABASE_URL")
 jwt_secret_key = os.getenv("JWT_SECRET_KEY")
 
 app = Flask(__name__)
+# CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
