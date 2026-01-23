@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 categories_bp = Blueprint("categories", __name__)
 
 @categories_bp.route("/", methods=['GET'])
+@categories_bp.route("", methods=['GET'])
 # @jwt_required()
 def get_categories():
     user_id = request.args.get('user_id')
@@ -18,10 +19,11 @@ def get_categories():
     result = []
     for c in categories:
         result.append({'category_id':c.category_id, 'name':c.name})
-    result.append({"user_id":user_id})
+    # result.append({"user_id":user_id})
     return jsonify(result)
 
 @categories_bp.route("/", methods=['POST'])
+@categories_bp.route("", methods=['POST'])
 # @jwt_required()
 def create_category():
     data = request.get_json()
@@ -43,3 +45,28 @@ def create_category():
         "user_id": new_category.user_id,
         "name": new_category.name
     })
+
+@categories_bp.route("/<int:category_id>", methods=['DELETE'])
+# @jwt_required()
+def delete_category(category_id):
+    # user_id = get_jwt_identity()
+    user_id = request.args.get('user_id')
+
+    if not user_id:
+        return jsonify({"error": "user_id missing"}), 400
+
+    category = Category.query.filter_by(
+        category_id=category_id,
+        user_id=user_id
+    ).first()
+
+    if not category:
+        return jsonify({"error": "Category not found"}), 404
+
+    db.session.delete(category)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Category deleted successfully",
+        "category_id": category_id
+    }), 200
