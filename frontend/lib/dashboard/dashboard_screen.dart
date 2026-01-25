@@ -61,14 +61,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final txs = await ApiService.getTransactions(1);
 
       setState(() {
-        totalIncome = double.tryParse(summary['total_income']?.toString() ?? '') ?? 0.0;
-        totalExpense = double.tryParse(summary['total_expense']?.toString() ?? '') ?? 0.0;
-        currentMonthIncome = double.tryParse(
-          summary['current_month_income']?.toString() ?? '',
-        ) ?? 0.0;
-        currentMonthExpense = double.tryParse(
-          summary['current_month_expense']?.toString() ?? '',
-        ) ?? 0.0;
+        totalIncome = double.parse(summary['total_income'].toString());
+        totalExpense = double.parse(summary['total_expense'].toString());
+        currentMonthIncome = double.parse(
+          summary['current_month_income'].toString(),
+        );
+        currentMonthExpense = double.parse(
+          summary['current_month_expense'].toString(),
+        );
         transactions = txs;
         isLoading = false;
         timelineStats = timeline;

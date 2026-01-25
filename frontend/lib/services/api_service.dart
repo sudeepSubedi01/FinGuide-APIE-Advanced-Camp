@@ -7,7 +7,7 @@ import '../models/timeline_stat_model.dart';
 import '../models/category_stat_model.dart';
 
 class ApiService {
-  static const String baseUrl = "http://localhost:5000";
+  static const String baseUrl = "http://192.168.1.55:5000";
   static const _storage = FlutterSecureStorage();
 
   // Get token
