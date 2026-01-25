@@ -3,8 +3,9 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:frontend/dashboard/dashboard_screen.dart';
 import 'package:frontend/transactions/transactions_screen.dart';
 import 'package:frontend/categories/category_mgmt_screen.dart';
-import 'package:frontend/ai/ai_insights_screen.dart';
+//import 'package:frontend/ai/ai_insights_screen.dart';
 import 'package:frontend/profile/user_profile_screen.dart';
+import 'package:frontend/ai/ai_insights_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
