@@ -7,7 +7,7 @@ import '../models/timeline_stat_model.dart';
 import '../models/category_stat_model.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.1.55:5000";
+  static const String baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: "http://3.218.94.99:5000");
   static const _storage = FlutterSecureStorage();
 
   //=====================================Get token=====================================================
@@ -82,7 +82,7 @@ class ApiService {
   }
 
   //======================================== TRANSACTIONS LIST ============================================
-  static Future<List<TransactionModel>> getTransactions(int user_id) async {
+  static Future<List<TransactionModel>> getTransactions(int userId) async {
     final token = await getToken();
     // final uri = Uri.parse(
     //   "$baseUrl/transactions",

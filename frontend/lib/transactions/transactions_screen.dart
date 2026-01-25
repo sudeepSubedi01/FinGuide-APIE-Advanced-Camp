@@ -1,7 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../models/transaction_model.dart';
 import '../services/api_service.dart';
-import 'widgets/transaction_tile.dart';
+import '../dashboard/widgets/transaction_tile.dart';
 import 'add_transaction_form.dart';
 
 class TransactionListScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   List<TransactionModel> transactions = [];
   List<TransactionModel> filteredTransactions = [];
 
-  String filter = "All";
+  String filter = "ALL";
   DateTime? customStartDate;
   DateTime? customEndDate;
 
@@ -29,7 +30,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   Future<void> _loadTransactions() async {
     try {
       final txs = await ApiService.getTransactions(1);
-      // txs.sort((a, b) => a.date.compareTo(b.date));
       setState(() {
         transactions = txs;
         filteredTransactions = List.from(txs);
@@ -46,115 +46,157 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF008080),
-      appBar: _coolAppBar(),
-      body: Column(
-        children: [
-          _actionButtons(),
-          _filterToggle(),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : transactions.isEmpty
-                  ? const Center(child: Text("No transactions yet"))
-                  : ListView.separated(
-                      padding: const EdgeInsets.only(top: 12),
-                      // itemCount: transactions.length,
-                      itemCount: filteredTransactions.length,
-                      separatorBuilder: (_, __) =>
-                          const Divider(color: Colors.black12),
-                      itemBuilder: (context, index) {
-                        return TransactionTile(
-                          // transaction: transactions[index],
-                          transaction: filteredTransactions[index],
-                          textColor: Colors.black87,
-                        );
-                      },
-                    ),
-            ),
+      extendBodyBehindAppBar: true,
+      appBar: _buildAppBar(),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF0D9488),
+              Color(0xFF115E59),
+              Color(0xFF134E4A),
+            ],
           ),
-        ],
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildActionButtons(),
+              const SizedBox(height: 8),
+              _buildFilterChips(),
+              const SizedBox(height: 16),
+              Expanded(child: _buildTransactionsList()),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  PreferredSizeWidget _coolAppBar() {
+  PreferredSizeWidget _buildAppBar() {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       centerTitle: true,
       title: const Text(
         "Transactions",
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+          letterSpacing: 0.5,
+        ),
       ),
       iconTheme: const IconThemeData(color: Colors.white),
     );
   }
 
-  Widget _actionButtons() {
+  Widget _buildActionButtons() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => _openAddTransaction(false),
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text("Add Income"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => _openAddTransaction(true),
-              icon: const Icon(Icons.remove, size: 18),
-              label: const Text("Add Expense"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
+          Expanded(child: _buildGlassButton(
+            icon: Icons.add_rounded,
+            label: "Income",
+            color: const Color(0xFF22C55E),
+            onTap: () => _openAddTransaction(false),
+          )),
+          const SizedBox(width: 14),
+          Expanded(child: _buildGlassButton(
+            icon: Icons.remove_rounded,
+            label: "Expense",
+            color: const Color(0xFFEF4444),
+            onTap: () => _openAddTransaction(true),
+          )),
         ],
       ),
     );
   }
 
-  Widget _filterToggle() {
+  Widget _buildGlassButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.2),
+                    Colors.white.withOpacity(0.08),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: color, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChips() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _filterChip("ALL"),
-          const SizedBox(width: 8),
-          _filterChip("THIS MONTH"),
-          const SizedBox(width: 8),
-          _filterChip("CUSTOM"),
+          _buildFilterChip("ALL"),
+          const SizedBox(width: 10),
+          _buildFilterChip("THIS MONTH"),
+          const SizedBox(width: 10),
+          _buildFilterChip("CUSTOM"),
         ],
       ),
     );
   }
 
-  Widget _filterChip(String label) {
+  Widget _buildFilterChip(String label) {
     final isSelected = filter == label;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) async {
+    return GestureDetector(
+      onTap: () async {
         if (label == "CUSTOM") {
           await _pickCustomDateRange();
         }
@@ -163,13 +205,122 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
         });
         _applyFilter();
       },
-      selectedColor: Colors.green,
-      backgroundColor: Colors.white24,
-      labelStyle: TextStyle(
-        color: isSelected
-            ? const Color(0xFF008080)
-            : const Color.fromARGB(255, 199, 183, 183),
-        fontWeight: FontWeight.w600,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Colors.white.withOpacity(0.25)
+              : Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? Colors.white.withOpacity(0.4)
+                : Colors.white.withOpacity(0.15),
+            width: 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            fontSize: 12,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransactionsList() {
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.95),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF0D9488),
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadTransactions,
+                  color: const Color(0xFF0D9488),
+                  child: filteredTransactions.isEmpty
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.5,
+                              child: _buildEmptyState(),
+                            ),
+                          ],
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                          itemCount: filteredTransactions.length,
+                          itemBuilder: (context, index) {
+                            return TransactionTile(
+                              transaction: filteredTransactions[index],
+                              textColor: const Color(0xFF1F2937),
+                              useGlassEffect: false,
+                            );
+                          },
+                        ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0D9488).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.receipt_long_rounded,
+              size: 48,
+              color: const Color(0xFF0D9488).withOpacity(0.5),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "No transactions yet",
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Add your first transaction above",
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -178,12 +329,8 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
     final added = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: AddTransactionForm(isExpense: isExpense, userId: 1),
-      ),
+      backgroundColor: Colors.transparent,
+      builder: (_) => AddTransactionForm(isExpense: isExpense, userId: 1),
     );
 
     if (added == true) {
@@ -225,6 +372,19 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
       initialDateRange: customStartDate != null && customEndDate != null
           ? DateTimeRange(start: customStartDate!, end: customEndDate!)
           : null,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF0D9488),
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Color(0xFF1F2937),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
