@@ -3,7 +3,8 @@ from models import db
 from dotenv import load_dotenv
 import os
 from sqlalchemy import text
-from routes import users_bp, categories_bp, transaction_bp, stats_bp
+from routes import users_bp, categories_bp, transaction_bp, stats_bp, ai_bp
+from routes.analytics import analytics_bp
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
@@ -28,6 +29,8 @@ app.register_blueprint(users_bp, url_prefix='/users')
 app.register_blueprint(categories_bp, url_prefix='/categories')
 app.register_blueprint(transaction_bp, url_prefix='/transactions')
 app.register_blueprint(stats_bp, url_prefix='/stats')
+app.register_blueprint(analytics_bp, url_prefix='/analytics')
+app.register_blueprint(ai_bp, url_prefix='/ai')
 
 @app.route("/")
 def home():
