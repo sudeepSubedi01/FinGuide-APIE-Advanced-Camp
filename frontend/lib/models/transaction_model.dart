@@ -19,7 +19,7 @@ class TransactionModel {
     return TransactionModel(
       categoryName: json['category'] != null
           ? json['category']['name'] ?? "Unknown"
-          : "Uncategorized",
+          : "Income",
       description: json['description'] ?? "",
       transactionType: json['transaction_type'] ?? "",
       date: DateTime.parse(json['transaction_date']),

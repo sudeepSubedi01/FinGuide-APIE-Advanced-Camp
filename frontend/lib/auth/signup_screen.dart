@@ -174,7 +174,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         width: 200,
                         child: DropdownButtonFormField<Currency>(
                           // initialValue: selectedCurrency,
-                          value: selectedCurrency,
+                          initialValue: selectedCurrency,
                           isExpanded: true,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../models/transaction_model.dart';
 import '../models/timeline_stat_model.dart';
@@ -85,211 +86,330 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF008080),
-      body: SafeArea(
-        child: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // HEADER
-                    Text(
-                      "Welcome, ${currentUser!.firstName} 🙇",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "Here’s your financial overview",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // OVERALL BALANCE CARDS
-                    const Text(
-                      "Overall Income Vs Expense",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    Row(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF0D9488),
+              Color(0xFF115E59),
+              Color(0xFF134E4A),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadDashboardData,
+                  color: Colors.white,
+                  backgroundColor: const Color(0xFF0D9488),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: BalanceCard(
-                            title: "Income",
-                            amount: totalIncome.toStringAsFixed(0),
-                            icon: Icons.trending_up,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: BalanceCard(
-                            title: "Expenses",
-                            amount: totalExpense.toStringAsFixed(0),
-                            icon: Icons.trending_down,
-                            color: Colors.redAccent,
-                          ),
-                        ),
+                        _buildHeader(),
+                        const SizedBox(height: 28),
+                        _buildSectionTitle("Overall Balance"),
+                        const SizedBox(height: 14),
+                        _buildBalanceCards(totalIncome, totalExpense),
+                        const SizedBox(height: 28),
+                        _buildSectionTitle("This Month"),
+                        const SizedBox(height: 14),
+                        _buildBalanceCards(currentMonthIncome, currentMonthExpense),
+                        const SizedBox(height: 28),
+                        _buildSectionTitle("Expense Breakdown"),
+                        const SizedBox(height: 14),
+                        _buildExpenseBreakdownCard(),
+                        const SizedBox(height: 28),
+                        _buildSectionTitle("Income vs Expense Trend"),
+                        const SizedBox(height: 14),
+                        _buildChartCard(),
+                        const SizedBox(height: 28),
+                        _buildSectionTitle("Recent Transactions"),
+                        const SizedBox(height: 14),
+                        _buildTransactionsList(),
                       ],
                     ),
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
 
-                    const SizedBox(height: 24),
-
-                    // CURRENT MONTH BALANCE CARDS
-                    const Text(
-                      "Current Month",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: BalanceCard(
-                            title: "Income",
-                            amount: currentMonthIncome.toStringAsFixed(0),
-                            icon: Icons.trending_up,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: BalanceCard(
-                            title: "Expenses",
-                            amount: currentMonthExpense.toStringAsFixed(0),
-                            icon: Icons.trending_down,
-                            color: Colors.redAccent,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // EXPENSE BREAKDOWN
-                    const Text(
-                      "Expense Breakdown",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(20),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          ExpensePieChart(categoryStats: categoryStats),
-                          SizedBox(height: 12),
-                          Column(
-                            children: categoryStats.asMap().entries.map((
-                              entry,
-                            ) {
-                              final index = entry.key;
-                              final stat = entry.value;
-                              final colors = [
-                                Colors.orange,
-                                Colors.blue,
-                                Colors.red,
-                                Colors.purple,
-                                Colors.green,
-                                Colors.yellow,
-                              ];
-                              return Row(
-                                children: [
-                                  Container(
-                                    width: 12,
-                                    height: 12,
-                                    color: colors[index % colors.length],
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    stat.categoryName,
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      "Income vs Expense",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    if (timelineStats.isEmpty)
-                      const Text(
-                        "No data",
-                        style: TextStyle(color: Colors.white70),
-                      )
-                    else
-                      IncomeExpenseBarChart(stats: timelineStats),
-
-                    const SizedBox(height: 24),
-
-                    // RECENT TRANSACTIONS
-                    const Text(
-                      "Recent Transactions",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    if (transactions.isEmpty)
-                      const Text(
-                        "No transactions found",
-                        style: TextStyle(color: Colors.white70),
-                      )
-                    else
-                      ...transactions
-                          .map((tx) => TransactionTile(transaction: tx))
-                          .toList(),
-                  ],
+  Widget _buildHeader() {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Welcome back,",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
+              const SizedBox(height: 4),
+              Text(
+                currentUser?.firstName ?? "User",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withOpacity(0.4),
+                Colors.white.withOpacity(0.1),
+              ],
+            ),
+          ),
+          child: CircleAvatar(
+            radius: 24,
+            backgroundColor: Colors.white.withOpacity(0.2),
+            child: const Icon(
+              Icons.person_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 20,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBalanceCards(double income, double expense) {
+    return Row(
+      children: [
+        Expanded(
+          child: BalanceCard(
+            title: "Income",
+            amount: income.toStringAsFixed(0),
+            icon: Icons.trending_up_rounded,
+            color: const Color(0xFF22C55E),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: BalanceCard(
+            title: "Expenses",
+            amount: expense.toStringAsFixed(0),
+            icon: Icons.trending_down_rounded,
+            color: const Color(0xFFEF4444),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExpenseBreakdownCard() {
+    final colors = [
+      const Color(0xFFF97316),
+      const Color(0xFF3B82F6),
+      const Color(0xFFEF4444),
+      const Color(0xFF8B5CF6),
+      const Color(0xFF22C55E),
+      const Color(0xFFEAB308),
+    ];
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.15),
+                Colors.white.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              ExpensePieChart(categoryStats: categoryStats),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 16,
+                runSpacing: 10,
+                children: categoryStats.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final stat = entry.value;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: colors[index % colors.length],
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        stat.categoryName,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildChartCard() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.15),
+                Colors.white.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: timelineStats.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      "No data available",
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                )
+              : IncomeExpenseBarChart(stats: timelineStats),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransactionsList() {
+    if (transactions.isEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.15),
+                  Colors.white.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.receipt_long_rounded,
+                    color: Colors.white.withOpacity(0.4),
+                    size: 48,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "No transactions yet",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: transactions
+          .take(5)
+          .map((tx) => TransactionTile(transaction: tx))
+          .toList(),
     );
   }
 
