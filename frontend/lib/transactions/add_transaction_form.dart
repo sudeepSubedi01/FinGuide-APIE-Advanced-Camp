@@ -38,7 +38,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   Future<void> _loadCategories() async {
     try {
       setState(() => loadingCategories = true);
-      final cats = await ApiService.getCategories(userId: widget.userId);
+      final cats = await ApiService.getCategories();
       setState(() {
         categories = List<Map<String, dynamic>>.from(cats);
         if (categories.isNotEmpty && categoryId == null) {
@@ -59,7 +59,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
 
     try {
       await ApiService.createTransaction(
-        userId: widget.userId,
+        // userId: widget.userId,
         amount: amount!,
         categoryId: widget.isExpense ? categoryId : null,
         transactionType: widget.isExpense ? "expense" : "income",
@@ -116,17 +116,15 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
                     value: c['category_id'] as int?,
                     child: Text(
                       c['name']?.toString() ?? "Unnamed",
-                    ), // 5. Display the name safely
+                    ),
                   );
                 }).toList(),
                 onChanged: (int? val) {
-                  // 6. 'val' is now int?
                   setState(() {
-                    categoryId = val; // 7. int? assigned to int? - No error!
+                    categoryId = val;
                   });
                 },
                 validator: (val) {
-                  // val here is an int?
                   if (widget.isExpense && val == null) {
                     return "Please select a category";
                   }

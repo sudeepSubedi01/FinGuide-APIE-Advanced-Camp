@@ -85,7 +85,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
     );
   }
 
-  //===================================== UI Components =====================
   PreferredSizeWidget _coolAppBar() {
     return AppBar(
       backgroundColor: Colors.transparent,

@@ -44,15 +44,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final startDate = rangeStart(daysBack: 30);
       final endDate = rangeEnd();
 
-      final summary = await ApiService.getSummary(1);
+      final summary = await ApiService.getSummary();
       final categories = await ApiService.getCategoryStats(
-        userId: 1,
         startDate: startOfMonth.toIso8601String().split('T')[0],
         endDate: endOfMonth.toIso8601String().split('T')[0],
       );
 
       final timeline = await ApiService.getTimelineStats(
-        userId: 1,
         startDate: formatDate(startDate),
         endDate: formatDate(endDate),
       );
@@ -133,7 +131,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: BalanceCard(
                             title: "Income",
                             amount: totalIncome.toStringAsFixed(0),
-                            // amount: "50000",
                             icon: Icons.trending_up,
                             color: Colors.white,
                           ),
