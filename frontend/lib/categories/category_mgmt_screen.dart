@@ -21,7 +21,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
 
   Future<void> _loadCategories() async {
     try {
-      final cats = await ApiService.getCategories(userId: 1);
+      final cats = await ApiService.getCategories();
       setState(() {
         categories = List<Map<String, dynamic>>.from(cats);
         isLoading = false;
@@ -144,7 +144,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
 
   Future<void> _addCategory(String name) async {
     try {
-      await ApiService.createCategory(userId: 1, name: name);
+      await ApiService.createCategory(name: name);
       _loadCategories();
     } catch (e) {
       debugPrint("Failed to add category: $e");

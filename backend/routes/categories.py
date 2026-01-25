@@ -6,10 +6,10 @@ categories_bp = Blueprint("categories", __name__)
 
 @categories_bp.route("/", methods=['GET'])
 @categories_bp.route("", methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_categories():
-    user_id = request.args.get('user_id')
-    # user_id = get_jwt_identity()
+    # user_id = request.args.get('user_id')
+    user_id = get_jwt_identity()
 
     if not user_id:
         return jsonify({'error':'user_id missing'}),400
@@ -24,11 +24,11 @@ def get_categories():
 
 @categories_bp.route("/", methods=['POST'])
 @categories_bp.route("", methods=['POST'])
-# @jwt_required()
+@jwt_required()
 def create_category():
     data = request.get_json()
-    user_id = data.get('user_id')
-    # user_id = get_jwt_identity()
+    # user_id = data.get('user_id')
+    user_id = get_jwt_identity()
     name = data.get('name')
 
     if not name:
@@ -47,10 +47,10 @@ def create_category():
     })
 
 @categories_bp.route("/<int:category_id>", methods=['DELETE'])
-# @jwt_required()
+@jwt_required()
 def delete_category(category_id):
-    # user_id = get_jwt_identity()
-    user_id = request.args.get('user_id')
+    user_id = get_jwt_identity()
+    # user_id = request.args.get('user_id')
 
     if not user_id:
         return jsonify({"error": "user_id missing"}), 400

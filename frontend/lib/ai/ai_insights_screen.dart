@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:frontend/services/api_service.dart';
 
 class AiInsightsScreen extends StatefulWidget {
-  final int userId;
-  const AiInsightsScreen({super.key, required this.userId});
+  // final int userId;
+  const AiInsightsScreen({
+    super.key,
+    // required this.userId
+  });
 
   @override
   State<AiInsightsScreen> createState() => _AiInsightsScreenState();
@@ -27,13 +30,11 @@ class _AiInsightsScreenState extends State<AiInsightsScreen> {
     try {
       final now = DateTime.now();
       final res = await ApiService.getMonthlyAnalytics(
-        userId: widget.userId,
+        // userId: widget.userId,
         year: now.year,
         month: now.month,
       );
 
-      print("Analytics loaded: $res");
-      
       setState(() {
         analytics = res;
         isLoading = false;
@@ -92,7 +93,6 @@ class _AiInsightsScreenState extends State<AiInsightsScreen> {
 
           const SizedBox(height: 12),
           _aiInputSection(),
-          // const SizedBox(height: 100),
         ],
       ),
     );
@@ -350,7 +350,7 @@ class _AiInsightsScreenState extends State<AiInsightsScreen> {
 
     try {
       final res = await ApiService.getAiInsightsWithPreference(
-        userId: widget.userId,
+        // userId: widget.userId,
         month: _currentMonth(),
         preference: Uri.encodeComponent(_preferenceController.text),
       );

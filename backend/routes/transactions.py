@@ -7,14 +7,14 @@ transaction_bp = Blueprint("transactions", __name__)
 
 @transaction_bp.route("/", methods=['GET'])
 @transaction_bp.route("", methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def list_transactions():
-    user_id = request.args.get('user_id')
-    # user_id = get_jwt_identity()
+    # user_id = request.args.get('user_id')
+    user_id = get_jwt_identity()
     if not user_id:
         return jsonify({'error':'user_id missing'}),400
     
-    transactions = Transaction.query.filter_by(user_id=user_id).all()
+    transactions = Transaction.query.filter_by(user_id=user_id).order_by(Transaction.transaction_date.desc(), Transaction.transaction_id.asc()).all()
 
     result = []
     for t in transactions:
@@ -32,12 +32,12 @@ def list_transactions():
 
 @transaction_bp.route("/", methods=['POST'])
 @transaction_bp.route("", methods=['POST'])
-# @jwt_required()
+@jwt_required()
 def create_transaction():
     data = request.get_json()
 
-    user_id = data.get("user_id")
-    # user_id = get_jwt_identity()
+    # user_id = data.get("user_id")
+    user_id = get_jwt_identity()
     amount = data.get('amount')
     transaction_type_enum = TransactionType(data.get('transaction_type'))
     category_id = data.get("category_id") if data.get("transaction_type") == "expense" else None

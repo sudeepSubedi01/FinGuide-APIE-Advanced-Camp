@@ -7,15 +7,25 @@ users_bp = Blueprint("users", __name__)
 
 @users_bp.route("/register", methods=["POST"])
 def user_register():
+    print("Register API HIT")
     data = request.get_json()
-
+    print(data)
     name = data.get("name")
     email = data.get("email")
     password = data.get("password")
     currency_code = data.get("currency_code")
 
     if not all([name, email, password, currency_code]):
-        return jsonify({'error: missing fields'}), 400
+        return jsonify({
+            "success": False,
+            "message": "Missing required fields"
+        }), 400
+    
+    if User.query.filter_by(email=email).first():
+        return jsonify({
+            "success": False,
+            "message": "Email already registered"
+        }), 409
     
     password_hash = generate_password_hash(password)
     
@@ -26,14 +36,11 @@ def user_register():
         currency_code = currency_code
     )
 
-    if User.query.filter_by(email=email).first():
-        return jsonify({'error': 'Email already registered'}), 409
-
-
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify({
+        "success": True,
         'message': 'User registered successfully',
         'user': {
             "name": new_user.name,
@@ -73,10 +80,10 @@ def user_login():
     }), 200
 
 @users_bp.route("/me", methods=["GET"])
-# @jwt_required
+@jwt_required()
 def user_profle():
-    # user_id = get_jwt_identity()
-    user_id = request.args.get("user_id")
+    user_id = get_jwt_identity()
+    # user_id = request.args.get("user_id")
     if not user_id:
         return jsonify({'error':'user_id missing'}),400
     
@@ -87,5 +94,6 @@ def user_profle():
     return jsonify({
         "id": user.user_id,
         "name": user.name,
-        "email": user.email
+        "email": user.email,
+        "currency_code":user.currency_code
     })

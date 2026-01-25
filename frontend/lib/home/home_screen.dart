@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     DashboardScreen(),
     TransactionListScreen(),
     CategoryManagementScreen(),
-    AiInsightsScreen(userId: 1),
+    AiInsightsScreen(),
     UserProfileScreen(),
   ];
 
@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       extendBody: true,
       body: IndexedStack(index: _currentIndex, children: _screens),
-      // _screens[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _currentIndex,
         height: 60.0,
